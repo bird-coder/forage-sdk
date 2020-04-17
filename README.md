@@ -1,2 +1,2 @@
 # forage-sdk
-an php sdk for foraging
+a php sdk for foraging
