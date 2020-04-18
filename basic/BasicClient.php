@@ -1,75 +1,97 @@
 <?php
 
-
+/**
+ * Created by PhpStorm.
+ * User: ASUS
+ * Date: 2020/4/18
+ * Time: 13:11
+ */
 class BasicClient
 {
-    public function curl($url, $postFields = null)
-    {
-        $header = array("Content-Type: application/json;charset=utf-8");
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_FAILONERROR, false);
-        curl_setopt($ch,CURLOPT_HTTPHEADER,$header);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
-        //https 请求
-        if(strlen($url) > 5 && strtolower(substr($url,0,5)) == "https" ) {
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        }
+    private $placeFile = './config/place.json';
+    private $recordFile = './config/record.json';
 
-        $reponse = curl_exec($ch);
+    public function syncData() {
+        global $config;
+        $lib = new SearchPlace();
+        $page = 0;
+        $pageSize = 20;
+        $total = 1;
+        $ak = isset($config['ak']) ? $config['ak'] : '';
+        $lib->setPageSize($pageSize);
+        $lib->setAK($ak);
 
-        if (curl_errno($ch))
-        {
-            throw new Exception(curl_error($ch),0);
-        }
-        else
-        {
-            $httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if (200 !== $httpStatusCode)
-            {
-                throw new Exception($reponse,$httpStatusCode);
+        $data = [];
+        while ($page*$pageSize < $total) {
+            $lib->setPage($page);
+            $list = $lib->search();
+            if (empty($list)) break;
+            if ($list['total'] <= 0) break;
+            $total = $list['total'];
+            foreach ($list['results'] as $result) {
+                $tmp = [
+                    'name'      => $result['name'],
+                    'location'  => $result['location'],
+                    'address'   => $result['address'],
+                    'telephone' => isset($result['telephone']) ? $result['telephone'] : '暂无',
+                ];
+                if ($result['detail'] == 1 && !empty($result['detail_info'])) {
+                    if (strpos($result['detail_info']['tag'], '咖啡') !== false || strpos($result['detail_info']['tag'], '蛋糕') !== false || strpos($result['detail_info']['tag'], '甜品') !== false) continue;
+                    $tmp['distance']    = $result['detail_info']['distance'];
+                    $tmp['detail_url']  = $result['detail_info']['detail_url'];
+                    $tmp['price']       = isset($result['detail_info']['price']) ? $result['detail_info']['price'] : '暂无';
+                    $tmp['overall_rating']  = isset($result['detail_info']['overall_rating']) ? $result['detail_info']['overall_rating'] : '暂无';
+                    $tmp['comment_num'] = isset($result['detail_info']['comment_num']) ? $result['detail_info']['comment_num'] : '暂无';
+                }
+                $data[] = $tmp;
             }
+            $page++;
         }
-        curl_close($ch);
-        return $reponse;
+        if (!empty($data)) file_put_contents($this->placeFile, json_encode($data, JSON_UNESCAPED_UNICODE));
     }
 
-    private function getMillisecond() {
-        list($s1, $s2) = explode(' ', microtime());
-        return (float)sprintf('%.0f', (floatval($s1) + floatval($s2)) * 1000);
+    private function randomFood() {
+        $list = json_decode(file_get_contents($this->placeFile), true);
+        $records = json_decode(file_get_contents($this->recordFile), true);
+        $total = count($list);
+        $like_list = $records['like_list'];
+        $randoms = range(0, $total - 1);
+        $randoms = array_diff($randoms, $like_list, $records['ban_list'], $records['filter']);
+        $new_list = array_merge($like_list, array_rand($randoms, 5));
+        $key = array_rand($new_list);
+        $index = $new_list[$key];
+        $records['filter'][] = $index;
+        file_put_contents($this->recordFile, json_encode($records, JSON_UNESCAPED_UNICODE));
+        return $list[$index];
     }
 
-    private function getCanonicalStringForIsv($timestamp, $suiteTicket) {
-        $result = $timestamp;
-        if($suiteTicket != null) {
-            $result .= "\n".$suiteTicket;
+    public function dealRecord($index, $mark = 'like') {
+        $records = json_decode(file_get_contents($this->recordFile), true);
+        switch ($mark) {
+            case 'like':
+                $records['like_list'][] = $index;
+                break;
+            case 'ban':
+                $records['ban_list'][] = $index;
+                break;
         }
-        return $result;
+        file_put_contents($this->recordFile, json_encode($records, JSON_UNESCAPED_UNICODE));
     }
 
-    private function computeSignature($accessSecret, $canonicalString){
-        $s = hash_hmac('sha256', $canonicalString, $accessSecret, true);
-        return urlencode(base64_encode($s));
+    public function clearFilter() {
+        $records = json_decode(file_get_contents($this->recordFile), true);
+        $records['filter'] = [];
+        file_put_contents($this->recordFile, json_encode($records, JSON_UNESCAPED_UNICODE));
     }
 
-    public function exec(){
-        $timestamp = $this->getMillisecond();
-        $appSecret = 'SECb5ebb3601f1aa76bf75452d6c1dccce13b1024bf400c88914105f4e4e34ac2d1';
-        $sign = $this->computeSignature($appSecret, $this->getCanonicalStringForIsv($timestamp, $appSecret));
-        $webhook = "https://oapi.dingtalk.com/robot/send?access_token=dbe2e460a51d922f357e9b3018420ee30e34d19a823cefe47fd38973ed96c303";
-        $webhook .= '&timestamp='.$timestamp.'&sign='.$sign;
-        $message="我就是我, 是不一样的烟火";
-        $data = array ('msgtype' => 'text','text' => array ('content' => $message));
-        $data_string = json_encode($data);
-
-        try{
-            $result = $this->curl($webhook, $data_string);
-            echo $result;
-        } catch (Exception $e) {
-            var_dump($e->getMessage());
-        }
+    public function sendDingTalkMsg() {
+        $lib = new DingTalkClient();
+        $data = $this->randomFood();
+        $tpl = "![screenshot](%slunch.jpg)
+        #### %s \n地址：%s   距离:%s米
+        人均：%s   评分:%s   评价人数:%s";
+        $text = sprintf($tpl, ROOTURL, $data['name'], $data['address'], $data['distance'], $data['price'], $data['overall_rating'], $data['comment_num']);
+        echo $text;
+//        $lib->sendActionCard('', $text, $data['detail_url']);
     }
 }

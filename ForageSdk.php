@@ -12,4 +12,9 @@ if (!defined('FORAGE_AUTOLOADER_PATH')) {
     define('FORAGE_AUTOLOADER_PATH', dirname(__FILE__));
 }
 
+if (!defined('FORAGE_LOG_PATH')) {
+    define('FORAGE_LOG_PATH', dirname(__FILE__).'/log/');
+}
+
 require('Autoloader.php');
+require('config/app.php');

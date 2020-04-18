@@ -24,6 +24,12 @@ class Autoloader{
             include $filename;
             return;
         }
+
+        $filename = FORAGE_AUTOLOADER_PATH.'/dingtalk/'.$name.'.php';
+        if (is_file($filename)) {
+            include $filename;
+            return;
+        }
     }
 }
 
