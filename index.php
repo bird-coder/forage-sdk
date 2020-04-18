@@ -9,6 +9,7 @@ class index
 {
     public function __construct()
     {
+        Log::write('receive params: '.urldecode(file_get_contents("php://input")));
     }
 
     public function choose() {
