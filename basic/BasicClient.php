@@ -10,6 +10,7 @@ class BasicClient
 {
     private $placeFile = './config/place.json';
     private $recordFile = './config/record.json';
+    private $index = 0;
 
     public function syncData() {
         global $config;
@@ -61,6 +62,7 @@ class BasicClient
         $key = array_rand($new_list);
         $index = $new_list[$key];
         $records['filter'][] = $index;
+        $this->index = $index;
         file_put_contents($this->recordFile, json_encode($records, JSON_UNESCAPED_UNICODE));
         return $list[$index];
     }
@@ -88,10 +90,10 @@ class BasicClient
         $lib = new DingTalkClient();
         $data = $this->randomFood();
         $tpl = "![screenshot](%slunch.jpg)
-        #### %s \n地址：%s   距离:%s米
+        #### %s
+        地址：%s   距离:%s米
         人均：%s   评分:%s   评价人数:%s";
         $text = sprintf($tpl, ROOTURL, $data['name'], $data['address'], $data['distance'], $data['price'], $data['overall_rating'], $data['comment_num']);
-        echo $text;
-//        $lib->sendActionCard('', $text, $data['detail_url']);
+        $lib->sendActionCard($this->index, '', $text, $data['detail_url']);
     }
 }
