@@ -71,13 +71,16 @@ class BasicClient
         $records = json_decode(file_get_contents($this->recordFile), true);
         switch ($mark) {
             case 'like':
+                if (in_array($index, $records['like_list'])) return false;
                 $records['like_list'][] = $index;
                 break;
             case 'ban':
+                if (in_array($index, $records['ban_list'])) return false;
                 $records['ban_list'][] = $index;
                 break;
         }
         file_put_contents($this->recordFile, json_encode($records, JSON_UNESCAPED_UNICODE));
+        return true;
     }
 
     public function clearFilter() {

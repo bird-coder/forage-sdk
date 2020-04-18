@@ -17,8 +17,9 @@ class index
         if (in_array($mark, ['like', 'change', 'ban'])) {
             $index = Util::param('id');
             $a = new BasicClient();
-            $a->dealRecord($index, $mark);
-            if ($mark != 'like') $a->sendDingTalkMsg();
+            if ($a->dealRecord($index, $mark)) {
+                if ($mark != 'like') $a->sendDingTalkMsg();
+            }
         }
         header("location:".getenv("HTTP_REFERER"));
     }
