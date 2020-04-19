@@ -3,48 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="https://g.alicdn.com/dingding/dingtalk-jsapi/2.10.3/dingtalk.open.js"></script>
+    <script type="text/javascript" src="https://g.alicdn.com/dingding/dingtalk-jsapi/2.10.3/dingtalk.open.js"></script>
+    <style type="text/css">
+        #back {
+            border: 1px solid #000;
+            border-radius: 5px;
+            background-color: #fff;
+            margin: 0;
+            padding: 20px;
+            width: 80%;
+        }
+    </style>
 </head>
 <body>
     <button id="back">返回</button>
 </body>
-<script>
+<script type="text/javascript">
     dd.ready(function () {
         alert('操作成功');
-        document.getElementById('back').onclick = function () {
-            dd.device.base.getPhoneInfo({
-                onSuccess : function(data) {
-                    /*
-                     {
-                     screenWidth: 1080, // 手机屏幕宽度
-                     screenHeight: 1920, // 手机屏幕高度
-                     brand:'Mi', // 手机品牌
-                     model:'Note4', // 手机型号
-                     version:'7.0', // 版本
-                     netInfo:'wifi', // 网络类型 wifi／4g／3g
-                     operatorType:'xx' // 运营商信息
-                     }
+        var ua = navigator.userAgent.toLowerCase() || '';
+        var isIOS = /iphone/i.test(ua) || /ipad/i.test(ua);
+        var isANDROID = ua.indexOf('android') != -1;
+        var isMobile = isIOS || isANDROID;
+        if (isMobile) {
+            dd.biz.navigation.close({
+                onSuccess : function(result) {
+                    /*result结构
+                     {}
                      */
-                    dd.biz.navigation.close({
-                        onSuccess : function(result) {
-                            /*result结构
-                             {}
-                             */
-                        },
-                        onFail : function(err) {}
-                    })
                 },
-                onFail : function(err) {
-                    dd.biz.navigation.quit({
-                        message: "quit message",//退出信息，传递给openModal或者openSlidePanel的onSuccess函数的result参数
-                        onSuccess : function(result) {
-                            /**/
-                        },
-                        onFail : function() {}
-                    })
-                }
-            });
+                onFail : function(err) {}
+            })
         }
+//        document.getElementById('back').onclick = function () {
+//            dd.device.base.getPhoneInfo({
+//                onSuccess : function(data) {
+//                    /*
+//                     {
+//                     screenWidth: 1080, // 手机屏幕宽度
+//                     screenHeight: 1920, // 手机屏幕高度
+//                     brand:'Mi', // 手机品牌
+//                     model:'Note4', // 手机型号
+//                     version:'7.0', // 版本
+//                     netInfo:'wifi', // 网络类型 wifi／4g／3g
+//                     operatorType:'xx' // 运营商信息
+//                     }
+//                     */
+//                    dd.biz.navigation.close({
+//                        onSuccess : function(result) {
+//                            /*result结构
+//                             {}
+//                             */
+//                        },
+//                        onFail : function(err) {}
+//                    })
+//                },
+//                onFail : function(err) {}
+//            });
+//        }
 
     })
 </script>
