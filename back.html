@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script type="text/javascript" src="https://g.alicdn.com/dingding/dingtalk-jsapi/2.10.3/dingtalk.open.js"></script>
+    <script type="text/javascript" src="./dingtalk.open.js"></script>
     <style type="text/css">
         #back {
             border: 1px solid #000;
@@ -26,14 +26,16 @@
         var isANDROID = ua.indexOf('android') != -1;
         var isMobile = isIOS || isANDROID;
         if (isMobile) {
-            dd.biz.navigation.close({
-                onSuccess : function(result) {
-                    /*result结构
-                     {}
-                     */
-                },
-                onFail : function(err) {}
-            })
+            setTimeout(function () {
+                dd.biz.navigation.close({
+                    onSuccess : function(result) {
+                        /*result结构
+                         {}
+                         */
+                    },
+                    onFail : function(err) {}
+                })
+            }, 2000);
         }
 //        document.getElementById('back').onclick = function () {
 //            dd.device.base.getPhoneInfo({
