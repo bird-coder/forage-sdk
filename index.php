@@ -23,6 +23,6 @@ class index
                 }
             }
         }
-        echo "<script>alert('操作成功');history.go(-1);</script>";
+        echo '操作成功';
     }
 }
