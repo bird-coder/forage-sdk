@@ -79,6 +79,10 @@ class BasicClient
                 if (in_array($index, $records['ban_list'])) return false;
                 $records['ban_list'][] = $index;
                 break;
+            case 'change':
+                if (in_array($index, $records['change'])) return false;
+                $records['change'][] = $index;
+                break;
         }
         file_put_contents($this->recordFile, json_encode($records, JSON_UNESCAPED_UNICODE));
         return true;
@@ -87,6 +91,7 @@ class BasicClient
     public function clearFilter() {
         $records = json_decode(file_get_contents($this->recordFile), true);
         $records['filter'] = [];
+        $records['change'] = [];
         file_put_contents($this->recordFile, json_encode($records, JSON_UNESCAPED_UNICODE));
     }
 
