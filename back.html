@@ -26,7 +26,7 @@
         var isANDROID = ua.indexOf('android') != -1;
         var isMobile = isIOS || isANDROID;
         if (isMobile) {
-            setTimeout(function () {
+            document.getElementById('back').onclick = function () {
                 dd.biz.navigation.close({
                     onSuccess : function(result) {
                         /*result结构
@@ -35,7 +35,7 @@
                     },
                     onFail : function(err) {}
                 })
-            }, 2000);
+            }
         }
 //        document.getElementById('back').onclick = function () {
 //            dd.device.base.getPhoneInfo({
