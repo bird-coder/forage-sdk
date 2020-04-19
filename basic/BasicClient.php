@@ -58,6 +58,7 @@ class BasicClient
         $like_list = $records['like_list'];
         $randoms = range(0, $total - 1);
         $randoms = array_diff($randoms, $like_list, $records['ban_list'], $records['filter']);
+        $like_list = array_diff($like_list, $records['filter']);
         $new_list = array_merge($like_list, array_rand($randoms, 5));
         $key = array_rand($new_list);
         $index = $new_list[$key];

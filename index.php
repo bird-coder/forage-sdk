@@ -9,18 +9,20 @@ class index
 {
     public function __construct()
     {
-        Log::write('receive params: '.urldecode(file_get_contents("php://input")));
+        Log::write('receive params: '.urldecode(json_encode($_REQUEST)));
     }
 
     public function choose() {
         $mark = Util::param('mark');
         if (in_array($mark, ['like', 'change', 'ban'])) {
             $index = Util::param('id');
-            $a = new BasicClient();
-            if ($a->dealRecord($index, $mark)) {
-                if ($mark != 'like') $a->sendDingTalkMsg();
+            if (!empty($index)) {
+                $a = new BasicClient();
+                if ($a->dealRecord($index, $mark)) {
+                    if ($mark != 'like') $a->sendDingTalkMsg();
+                }
             }
         }
-        echo "<script>alert('操作成功');window.opener=null;window.open('','_self');window.close();</script>";
+        echo "<script>alert('操作成功');history.go(-1);</script>";
     }
 }
