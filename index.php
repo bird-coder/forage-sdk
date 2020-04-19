@@ -21,6 +21,6 @@ class index
                 if ($mark != 'like') $a->sendDingTalkMsg();
             }
         }
-        header("location:".getenv("HTTP_REFERER"));
+        echo "<script>alert('操作成功');window.opener=null;window.open('','_self');window.close();</script>";
     }
 }
