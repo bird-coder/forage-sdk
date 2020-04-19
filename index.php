@@ -3,7 +3,7 @@
 include 'ForageSdk.php';
 $lib = new index();
 $action = Util::param('action');
-$lib->$aciton();
+$lib->$action();
 
 class index
 {
