@@ -12,7 +12,7 @@ class Log
         if (!file_exists(FORAGE_LOG_PATH)) {
             @mkdir(FORAGE_LOG_PATH);
         }
-        chmod(FORAGE_LOG_PATH, 777);
+        chmod(FORAGE_LOG_PATH, 0777);
         if (!is_writable(FORAGE_LOG_PATH)) exit('FORAGE_LOG_PATH is not writable !');
         $s_now_time = date('[Y-m-d H:i:s]');
         $s_now_day  = date('Y_m_d');
