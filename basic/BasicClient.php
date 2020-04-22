@@ -8,8 +8,8 @@
  */
 class BasicClient
 {
-    private $placeFile = './config/place.json';
-    private $recordFile = './config/record.json';
+    private $placeFile = FORAGE_AUTOLOADER_PATH.'/config/place.json';
+    private $recordFile = FORAGE_AUTOLOADER_PATH.'/config/record.json';
     private $index = 0;
 
     public function syncData() {

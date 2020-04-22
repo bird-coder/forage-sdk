@@ -23,6 +23,6 @@ class index
                 }
             }
         }
-        echo file_get_contents('./back.html');
+        echo file_get_contents(FORAGE_AUTOLOADER_PATH.'/back.html');
     }
 }
