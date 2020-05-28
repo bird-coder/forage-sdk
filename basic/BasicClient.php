@@ -98,11 +98,11 @@ class BasicClient
     public function sendDingTalkMsg() {
         $lib = new DingTalkClient();
         $data = $this->randomFood();
-        $tpl = "![screenshot](%slunch.jpg)  
+        $tpl = "![screenshot](%s%s)  
         ### %s  
         地址：%s   距离:%s米  
         人均：%s   评分:%s   评价人数:%s";
-        $text = sprintf($tpl, ROOTURL, $data['name'], $data['address'], $data['distance'], $data['price'], $data['overall_rating'], $data['comment_num']);
+        $text = sprintf($tpl, ROOTURL, $data['img'], $data['name'], $data['address'], $data['distance'], $data['price'], $data['overall_rating'], $data['comment_num']);
         $lib->sendActionCard($this->index, '', $text, $data['detail_url']);
     }
 }
